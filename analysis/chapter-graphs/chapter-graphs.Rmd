@@ -68,12 +68,8 @@ read_chunk("./analysis/chapter-graphs/chapter-graphs.R") # This allows knitr to 
 ```{r tweak-data, echo=echo_chunks, results='show', message=message_chunks}
 ```
 
-Summary {.tabset .tabset-fade .tabset-pills}
-===========================================================================
-
 Notes
 ---------------------------------------------------------------------------
-
 
 
 Example 1: Waiting Times Basic 
@@ -82,15 +78,11 @@ Example 1: Waiting Times Basic
 ```{r waiting-times-basic, echo=echo_chunks, message=message_chunks}
 ```
 
-
 Example 2: Sampling Frames 
 ===========================================================================
 
 ```{r sampling-frame, echo=echo_chunks, message=message_chunks}
 ```
-
-
-
 
 Session Information {#session-info}
 ===========================================================================

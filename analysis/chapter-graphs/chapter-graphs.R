@@ -10,19 +10,16 @@ import::from("magrittr", "%>%")
 requireNamespace("dplyr")
 
 # ---- declare-globals ---------------------------------------------------------
-options(show.signif.stars=F) #Turn off the annotations on p-values
+set.seed(9090)
 # config                      <- config::get()
-# path_input                  <- config$path_car_derived
-# Uncomment the lines above and delete the one below if value is stored in 'config.yml'.
 
 # ---- load-data ---------------------------------------------------------------
 
 # ---- tweak-data --------------------------------------------------------------
 
-
 # ---- waiting-times-basic -----------------------------------------------------
-library(bootstrap)
-library(boot)
+# library(bootstrap)
+# library(boot)
 
 rtSample <- c(1, 4, 10, 50, 80)
 
@@ -42,16 +39,16 @@ rtMedian <- median(rtSample)
 samplingFrame <- rtSample
 
 #Stage 3: Create B bootstrap samples of size N.
-B <- 999
+B <- 999L
 N <- length(rtSample)
 bootstrapScores <- matrix(NA, nrow=B, ncol=N)
-for( bootstrapIndex in 1:B ) {
+for( bootstrapIndex in seq_len(B) ) {
   bootstrapScores[bootstrapIndex, ] <- sample(x=samplingFrame, size=N, replace=TRUE)
 }
 
 #Stage 4:  Calculate the median of each bootstrap sample
 bootstrapMedians <- rep(NA, length=B)
-for( bootstrapIndex in 1:B ) {
+for( bootstrapIndex in seq_len(B) ) {
   star <- median( bootstrapScores[bootstrapIndex, ])
   #Add error checking to the star statistic (but this is not a problem for the median, but possibly oter stats you'd use).
   bootstrapMedians[bootstrapIndex] <- star
@@ -78,7 +75,7 @@ rtMean <- mean(rtSample)
 
 #Stage 4: Calculate the the mean of each bootstrap sample
 bootstrapMeans <- rep(NA, length=B)
-for( bootstrapIndex in 1:B ) {
+for( bootstrapIndex in seq_len(B) ) {
   star <- mean( bootstrapScores[bootstrapIndex, ])
   #Add error checking to the star statistic (but this is not a problem for the mean, but possibly oter stats you'd use).
   bootstrapMeans[bootstrapIndex] <- star
@@ -132,15 +129,15 @@ print(ciOfMeanBootstrap)
 #Stage 5: Declare a null hypothesis and calculate the p-value.
 nullMean <- 5
 countOfBootstrappedMeansEqualOrLessThanNull <- sum(bootstrapMeans <= nullMean)
-pValueOneTail <- countOfBootstrappedMeansEqualOrLessThanNull / (B + 1)
+pValueOneTail <- countOfBootstrappedMeansEqualOrLessThanNull / (B + 1L)
 
 #Show bootstrap stats
 hist(bootstrapMeans[bootstrapMeans <= nullMean], breaks=breaks, col=colorTail, add=T) #Write over
 abline(v=nullMean, col=colorTail, lty=3)
 mtext(expression(italic(H)[0]), side=1, line=.3, at=nullMean, col=colorTail)
-#mtext("Hyp", side=1, at=nullMean, col="orange")
-print(pValueOneTail)
 par(oldPar)
+
+print(pValueOneTail)
 
 
 # ---- sampling-frame ----------------------------------------------------------
@@ -154,8 +151,6 @@ yRect <- rep(y, each=5)
 #oldPar <- par(mfrow=c(1,2), mar=c(0,.1,1.7,.1), pin=c(1.5,1), omi=c(0,0,0,0))
 #oldPar <- par(mfrow=c(1,2), mar=c(0.1,.1,1.7,.1),  omi=c(0,0,0,0))
 oldPar <- par(mfrow=c(1,2), mai=c(0.05,.05,.35,.05), omi=c(0,0,0,0))
-#                                               mar=c(0.2,.1,1.7,.1),
-
 plot(x, y, col="gray70", pch=16, xpd=NA,
      xaxt="n", yaxt="n", xlab="", ylab="", cex.main=1, fg="gray70",
      main="Observed Sample and\nBivariate Sampling Frame")
@@ -165,7 +160,5 @@ plot(x, y, bg="gray70", pch=21, xpd=NA,
      xaxt="n", yaxt="n", xlab="", ylab="",  cex.main=1, fg="gray70",
      main="Univariate Sampling Frame")
 points(xRect, yRect)
-
-
 par(oldPar)
 
