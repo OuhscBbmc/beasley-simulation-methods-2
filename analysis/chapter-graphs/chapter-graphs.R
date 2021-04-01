@@ -20,7 +20,6 @@ set.seed(9090)
 # ---- waiting-times-basic -----------------------------------------------------
 # library(bootstrap)
 # library(boot)
-
 rtSample <- c(1, 4, 10, 50, 80)
 
 oldPar <- par(mfrow=c(1,2), mar=c(2.15,1.9,3,0), mgp=c(1, 0, 0), tcl=0)
@@ -29,9 +28,8 @@ colorTail <- gray(.4)
 colorFill <- gray(.8)
 colorBorder <- gray(.7)
 colorCI <- gray(.5)
-###
-### Example 1a: Standard Error of the Median
-###
+
+### Standard Error of the Median
 #Stage 1: Collect sample and calculate observed median
 rtMedian <- median(rtSample)
 
@@ -65,9 +63,7 @@ mtext(expression(italic(MD)[obs]), side=1, at=rtMedian, col=colorLocation) #Labe
 standardErrorOfMedian <- sd(bootstrapMedians)
 print(standardErrorOfMedian)
 
-###
-### Example 1b: Standard Error of the Mean
-###
+### Standard Error of the Mean
 #Stage 1: Collect sample and calculate observed mean
 rtMean <- mean(rtSample)
 
@@ -94,36 +90,32 @@ mtext(expression(bar(italic(X))[Obs]), side=1, line=.3, at=rtMean, col=colorLoca
 standardErrorOfMean <- sd(bootstrapMeans)
 print(standardErrorOfMean)
 
-###
-### Example 1c: CI for the Mean
-###
+### CI for the Mean
 #Stages 1-4: Reuse the calculations in Stages 1-4 of Example 1b.
 
 #Stage 5: Determine the CI.
 alpha <- .05 #The proprtion of scores in both tails combined.
 numberOfScoresInTails <- alpha/2 * (B+1) #Calculating the number of scores in each tail.
 ciOfMeanBootstrap <- quantile(bootstrapMeans, probs=c(.025, .975), type=2)
-#The line of code above does (specify type=2):
+#The line of code above does the following four (specify type=2):
 #  bootstrapMeans <- sort(bootstrapMeans)
 #  lowerBoundary <- bootstrapMeans[numberOfScoresInTails]
 #  upperBoundary <- bootstrapMeans[B-numberOfScoresInTails+1]
 #  ciOfMeanBootstrap <- c(lowerBoundary, upperBoundary)
-
 
 #Modify an arrow to indicate the CI; draw it on top of the graph created in Example 1b.
 heightOfBootstrapCI <- B*-.001 #This is the cosmetic height of the bar plotted below the distribution.
 arrows(x0=ciOfMeanBootstrap[1],x1=ciOfMeanBootstrap[2], y=heightOfBootstrapCI, y1=heightOfBootstrapCI, col=colorCI, angle=90, code=3, lwd=3, xpd=NA, length=.1)
 
 ciOfMeanParametric <- rtMean + c(-1, 1)*1.96*(sd(rtSample) / sqrt(N))
-##Modify an arrow to indicate the parametric CI
+
+#Modify an arrow to indicate the parametric CI
 #heightOfParametricCI <- B*-.003
 #arrows(x0=ciOfMeanParametric[1],x1=ciOfMeanParametric[2], y=heightOfParametricCI, y1=heightOfParametricCI, col="orange", angle=90, code=3, lwd=3, xpd=NA, length=.1)
 
 print(ciOfMeanBootstrap)
 
-###
-### Example 1d: p-value for the Mean
-###
+### p-value for the Mean
 #Stages 1-4: Reuse the calculations in Stages 1-4 of Example 1b.
 
 #Stage 5: Declare a null hypothesis and calculate the p-value.
@@ -139,17 +131,12 @@ par(oldPar)
 
 print(pValueOneTail)
 
-
 # ---- sampling-frame ----------------------------------------------------------
 x <- c(1, 2, 3, 3.5, 5)
 y <- c(10, 15, 35, 25, 40)
 xRect <- rep(x, times=5)
 yRect <- rep(y, each=5)
 
-#oldPar <- par(mfrow=c(1,2), mar=c(3,3,3,3))#, fin=c(2,2))
-#oldPar <- par(mfrow=c(1,2), mar=c(0.1,.1,1.7,.1), pin=c(2,1.1))
-#oldPar <- par(mfrow=c(1,2), mar=c(0,.1,1.7,.1), pin=c(1.5,1), omi=c(0,0,0,0))
-#oldPar <- par(mfrow=c(1,2), mar=c(0.1,.1,1.7,.1),  omi=c(0,0,0,0))
 oldPar <- par(mfrow=c(1,2), mai=c(0.05,.05,.35,.05), omi=c(0,0,0,0))
 plot(x, y, col="gray70", pch=16, xpd=NA,
      xaxt="n", yaxt="n", xlab="", ylab="", cex.main=1, fg="gray70",
@@ -161,4 +148,161 @@ plot(x, y, bg="gray70", pch=21, xpd=NA,
      main="Univariate Sampling Frame")
 points(xRect, yRect)
 par(oldPar)
+
+
+# ---- rejection-sampling ------------------------------------------------------
+colorCandidateBounds <- gray(.6)
+colorAccept <- gray(.6)
+colorReject <- gray(.85)
+colorCI <- gray(.5)
+colorAxis <- NA #gray(.9)
+colorLabel <- gray(.6)
+markAccept <- 1 #Circle
+markReject <- 4 #An 'x'
+lineTypeCandidate <- "F4"
+pointSize <- .9
+
+### Bounded theta parameter
+replicationCount <- 400L #Use many more points than 400.  This low number is just for graphing.
+
+#Uncomment the next line to combine with the graph of Example 4b.
+par( mfrow=c(1,2), mar=c(2, 1.6, 1.2, 1), mgp=c(.8,0,0), tcl=0)
+
+#Stage 1: Specify the pdf of the posterior and draw it.
+PosteriorPdf <- function( x ) {
+  return( .3*dbeta( x=x+.5, shape1=9, shape2=3 ) +.7*dbeta( x=x+.5, shape1=2, shape2=5 ) )
+}
+
+#Stage 2a: Set the bounds of the candidate values.
+xRange <- c(-.5, .5) #This range covers the allowable values of the target distribution.
+#Drawing was listed as Stage 1, but we're delaying it to get the xRange precise
+curve(PosteriorPdf(x), xlim=xRange, bty="n", xaxt="n", lwd=2, xaxt="n", yaxt="n", xaxs="i", yaxs="i",
+  col.axis=colorAxis, col.lab=colorLabel,
+  xlab=expression(theta), ylab="Density") #Draw the pdf on top of the empty plot.
+
+axis(1, at=c(-.5, -.25, 0, .25, .5), labels=c("-.5", "-.25", "0", ".25", ".5"), col=colorAxis, col.axis=colorLabel)
+axis(2, col=colorAxis, col.axis=colorLabel)
+#Stage 2b: Determine the upper bound for the density (ie, how high the target distribution goes on the vertical axis).
+yRange <- c(0, 1.75) #This range can be determined with trial-and-error.
+
+rect(xleft=xRange[1], xright=xRange[2], ytop=yRange[2], ybottom=yRange[1], xpd=NA,
+  lwd=2, lty=lineTypeCandidate, border=colorCandidateBounds)
+
+posteriorPoints <- numeric(0)
+for( replicationIndex in 1:replicationCount ) {
+  #Step 3a: Generate the x value for a candidate.
+  xValue <- runif(n=1, min=xRange[1], max=xRange[2])
+
+  #Step 3b: Generate the height of the candidate
+  yValue <- runif(n=1, min=yRange[1], max=yRange[2])
+
+  #Step 4: Determine if the candidate is underneath the pdf's curve
+  #  Add to the distribution if accepted
+  accept <- (yValue < PosteriorPdf(xValue))
+  if( accept ) {
+    points(xValue, yValue, col=colorAccept, pch=markAccept, cex=pointSize)
+    posteriorPoints <- c(posteriorPoints, xValue)
+  }
+  else {
+    points(xValue, yValue, col=colorReject, pch=markReject, cex=pointSize)
+  }
+  rm(xValue, yValue, accept) #Remove the variables
+}
+
+acceptProportion <- length(posteriorPoints) / replicationCount
+mtext(paste("Accepted Proportion:", acceptProportion), line=.4, col=colorLabel)
+
+#Step 5: Calculate summary statistics
+posteriorMean <- mean(posteriorPoints)
+#posteriorMedian <- median(posteriorPoints)
+
+ci95 <- quantile(posteriorPoints, probs=c(.025, .975))
+
+#Plot the summary statistics
+#abline(v=c(posteriorMean, posteriorMedian))
+#mtext(side=1, at=c(posteriorMean, posteriorMedian), text=c(expression(bar(theta)), expression(theta["50%"])), line=c(.2, .2))
+abline(v=posteriorMean, lty=2)
+text(x=posteriorMean, y=1.5, expression(bar(theta)), xpd=TRUE, adj = 1.1)
+
+#Modify an arrow to indicate the CI; draw it on top of the graph created in Example 1b.
+arrows(x0=ci95[1], x1=ci95[2], y=0, y1=0, col=colorCI, angle=90, code=3, lwd=3, xpd=NA, length=.1)
+
+text(expression(italic(f)(theta)), x=.35, y=PosteriorPdf(.35), pos=4)
+text("0", x=xRange[2], y=yRange[1], xpd=NA, pos=4, col=colorCandidateBounds)
+text(expression(italic(c)), x=xRange[2], y=yRange[2], xpd=NA, pos=4, col=colorCandidateBounds)
+
+### Unbounded theta parameter
+replicationCount <- 200L #Use many more points than 200.  This low number is just for graphing.
+
+#Prepare a blank plot.  Determine the graphing limits by trial-and-error.
+xRangeOfGraph <- c(-5, 5) #This range covers the majority of the t distribution.
+yRangeOfGraph <- c(0, .75)
+plot(NA, xlim=xRangeOfGraph, ylim=yRangeOfGraph, bty="n", xaxt="n", yaxt="n", xaxs="i",yaxs="i",
+  col.axis=colorAxis, col.lab=colorLabel,
+  xlab=expression(theta), ylab="")
+axis(1, col=colorAxis, col.axis=colorLabel)
+text(x=xRangeOfGraph[2], y=c(0, .3, .6), c("0", ".3", ".6"), srt=-90, col=colorLabel, xpd=NA)
+
+#Stage 1: Specify and graph the pdf of the posterior (ie, the target distribution).
+PosteriorPdf <- function( x ) {
+  return( .55*dlogis(x, location=-.95, scale=.5) + .45*dnorm( x=x, mean=.7, sd=.45 )  )
+}
+curve(PosteriorPdf(x), add=TRUE, lwd=2) #Draw the target pdf on top of the empty plot.
+
+#Stage 2a: Define the candidate distribution.
+candidateDf <- 3
+#Define the Candidate distribution.
+CandidatePdf <- function( x ) {
+  return( dt(x, df=candidateDf) )
+}
+#Define the Random Number Generator for the Candidate distribution.
+CandidatePdfRng <- function( count ) {
+  return( rt(n=count, df=candidateDf))
+}
+
+#Stage 2b: Define the scaling constant of the Candidate distribution
+scalingConstant <- 2
+
+#Stage 2c: Graph the candidate distribution
+curve(scalingConstant * CandidatePdf(x), add=TRUE, col=colorCandidateBounds, lty=lineTypeCandidate, lwd=2)
+
+posteriorPoints <- numeric(0) #Declare an empty vector (which will be appended to).
+for( replicationIndex in seq_len(replicationCount) ) {
+  #Step 3a: Generate a candidate.
+  xValue <- CandidatePdfRng(count=1)
+
+  #Step 3b: Generate the height of the candidate
+  maxHeightOfCandidateDensity <- scalingConstant*CandidatePdf(xValue)
+  yValue <- runif(n=1, min=0, max=maxHeightOfCandidateDensity)
+
+  #Step 4: Determine if the candidate is underneath the pdf's curve
+  #  Add to the distribution if accepted
+  accept <- (yValue < PosteriorPdf(xValue))
+  if( accept ) {
+    points(xValue, yValue, col=colorAccept, pch=markAccept, xpd=NA, cex=pointSize)
+    posteriorPoints <- c(posteriorPoints, xValue)
+  }
+  else {
+    points(xValue, yValue, col=colorReject, pch=markReject, xpd=F, cex=pointSize)
+  }
+  rm(xValue, yValue, accept) #Remove the variables
+}
+
+acceptProportion <- length(posteriorPoints) / replicationCount
+mtext(paste("Accepted Proportion:", acceptProportion), line=.4, col=colorLabel)
+
+#Step 5: Calculate summary statistics
+posteriorMean <- mean(posteriorPoints)
+ci95 <- quantile(posteriorPoints, probs=c(.025, .975))
+
+#Modify an arrow to indicate the CI; draw it on top of the graph created in Example 1b.
+arrows(x0=ci95[1], x1=ci95[2], y=0, y1=0, col=colorCI, angle=90, code=3, lwd=3, xpd=NA, length=.1)
+
+#Plot the summary statistics
+abline(v=posteriorMean, lty=2)
+text(x=posteriorMean, y=.5, expression(bar(theta)), xpd=NA, adj = c(1.1))
+
+text(expression(italic(f)(theta)), x=0, y=PosteriorPdf(0), pos=4)
+text(expression(italic(c)%*%italic(g)(theta)), x=.5, y=scalingConstant*CandidatePdf(.5), pos=4, col=colorCandidateBounds)
+
 

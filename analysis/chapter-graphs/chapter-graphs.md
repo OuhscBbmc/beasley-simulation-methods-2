@@ -69,6 +69,11 @@ Example 2: Sampling Frames
 
 ![](figure-png/sampling-frame-1.png)<!-- -->
 
+Example 3: Rejection Sampling
+===========================================================================
+
+![](figure-png/rejection-sampling-1.png)<!-- -->
+
 Session Information {#session-info}
 ===========================================================================
 
@@ -156,4 +161,4 @@ For the sake of documentation and reproducibility, the current report was render
 
 
 
-Report rendered by wibeasley at 2021-03-31, 19:39 -0500 in 3 seconds.
+Report rendered by wibeasley at 2021-03-31, 20:11 -0500 in 3 seconds.
