@@ -74,6 +74,11 @@ Example 3: Rejection Sampling
 
 ![](figure-png/rejection-sampling-1.png)<!-- -->
 
+Example 4: Independent Metropolis-Hastings
+===========================================================================
+
+![](figure-png/independent-metropolis-hastings-1.png)<!-- -->
+
 Session Information {#session-info}
 ===========================================================================
 
@@ -161,4 +166,4 @@ For the sake of documentation and reproducibility, the current report was render
 
 
 
-Report rendered by wibeasley at 2021-03-31, 20:11 -0500 in 3 seconds.
+Report rendered by wibeasley at 2021-03-31, 20:18 -0500 in 4 seconds.

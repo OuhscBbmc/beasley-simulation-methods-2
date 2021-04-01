@@ -90,6 +90,12 @@ Example 3: Rejection Sampling
 ```{r rejection-sampling, echo=echo_chunks, message=message_chunks}
 ```
 
+Example 4: Independent Metropolis-Hastings
+===========================================================================
+
+```{r independent-metropolis-hastings, echo=echo_chunks, message=message_chunks}
+```
+
 Session Information {#session-info}
 ===========================================================================
 

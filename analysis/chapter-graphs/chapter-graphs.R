@@ -305,4 +305,132 @@ text(x=posteriorMean, y=.5, expression(bar(theta)), xpd=NA, adj = c(1.1))
 text(expression(italic(f)(theta)), x=0, y=PosteriorPdf(0), pos=4)
 text(expression(italic(c)%*%italic(g)(theta)), x=.5, y=scalingConstant*CandidatePdf(.5), pos=4, col=colorCandidateBounds)
 
+# ---- independent-metropolis-hastings -----------------------------------------
+replicationCount <- 5000L
+plotGrayscale <- TRUE
+if( plotGrayscale ) { #For Figure 4.
+  colorTargetBounds <- gray(0) #"blue"
+  colorCandidateBounds <- gray(.6) #"blue"
+  colorAccept <- gray(.4)
+  colorReject <- gray(.6)
+  colorAcceptFill <- gray(.9)#hsv(h=.416,s=.2,v=.95, gamma=1)
+  colorAxis <- NA #gray(.9)
+  colorAxisChain <- gray(.9)
+  colorLabel <- gray(.6)
+} else {
+  colorTargetBounds <- "black"
+  colorCandidateBounds <- "blue"
+  colorAccept <- "springgreen3"
+  colorReject <- "orange"
+  colorAcceptFill <- hsv(h=.416,s=.2,v=.95)
+  colorAxis <- gray(.9)
+  colorAxisChain <- gray(.9)
+  colorLabel <- gray(.6)
+}
+lineWeightDistribution <- 1
+
+markAccept <- 1 #'1' corresponds to a circle for the graph
+markReject <- 4 #'4' corresponds to an 'x'
+lineTypeCandidate <- "F4"
+set.seed(4) #Figure 4 was created using this seed.
+
+oldPar <- par( mar=c(2, 1.6, 0.4, 0), mgp=c(.8,0,0), tcl=0)
+layout(rbind(c(1,2, 4), c(3,3,4)), widths=c(1,1, .05))
+
+#Prepare a blank plot (in the top left panel).  Determine the graphing limits by trial-and-error.
+xRangeOfGraph <- c(-5, 5) #This range covers the majority of the t distribution.
+yRangeOfGraph <- c(0, .36)
+plot(NA, xlim=xRangeOfGraph, ylim=yRangeOfGraph, bty="n", xaxs="i",yaxs="i", xaxt="n", yaxt="n",
+  col.axis=colorAxis, col.lab=colorLabel,
+  xlab=expression(theta), ylab="Density")
+axis(1, col=colorAxis, col.axis=colorLabel)
+axis(2, at=c(0, .15, .3), labels=c("0", ".15", ".3"), col=colorAxis, col.axis=colorLabel)
+
+#Stage 1: Define the target distribution and draw it.
+TargetPdf <- function( x ) {
+  return( .4*dnorm(x=x, mean=-1, sd=.5) + .6*dlogis(x, location=1, scale=.6) )
+}
+
+#Stage 2: Declare the candidate distribution's parameter.
+candidateDf <- 3
+#Define a function for the Candidate distribution.
+CandidatePdf <- function( x ) {
+  center <- 0 #This value will be set in Example 5b; it's the primary difference between the IMH and MH.
+  return( dt(x - center, df=candidateDf) )
+}
+#Define the Random Number Generator for the Candidate distribution.
+CandidatePdfRng <- function( count ) {
+  center <- 0 #This value will be set in Example 5b
+  return( rt(n=count, df=candidateDf) - center )
+}
+
+#Draw the candidate.
+curve(CandidatePdf(x), add=TRUE, col=colorCandidateBounds, lty=lineTypeCandidate, xpd=TRUE, lwd=lineWeightDistribution)
+
+targetPoints <- rep(NA, length=replicationCount) #A vector filled with B missing values.
+targetPoints[1] <- CandidatePdfRng(count=1) #Initialize the first incumbent
+loosingNewCandidatePoints <- rep(NA, length=replicationCount) #A vector filled with B missing values.
+loosingNewCandidatePoints[1] <- targetPoints[1]  #Initialize the first incumbent
+for( replicationIndex in 2:replicationCount ) {
+  #Step 3a: Generate a candidate of beta
+  x <- CandidatePdfRng(count=1)
+
+  #Step 3b: Calculate the product of ratios
+  fx <- TargetPdf(x)
+  gx <- CandidatePdf(x)
+  z <- targetPoints[replicationIndex - 1] #Remember the candidate who won the last step.
+  fz <- TargetPdf(z)
+  gz <- CandidatePdf(z)
+  r <- (gz * fx ) / (fz * gx)
+
+  #Step 4: Determine if the candidate is underneath the pdf's curve; Add to the distribution if accepted
+  if( r > 1 ) {
+    targetPoints[replicationIndex] <- x
+  }
+  else {
+    y <- runif(n=1, min=0, max=1)
+    if( r > y ) {
+      targetPoints[replicationIndex] <- x
+    }
+    else {
+      targetPoints[replicationIndex] <- z
+      loosingNewCandidatePoints[replicationIndex] <- x
+    }
+  }
+}
+#Step 5: Calculate summary statistics
+targetMean <- mean(targetPoints)
+ci95 <- quantile(targetPoints, probs=c(.025, .975))
+hist(targetPoints, xlim=xRangeOfGraph, ylim=yRangeOfGraph, add=TRUE, col=colorAcceptFill, border="white",
+   breaks=60, freq=FALSE, main="", xlab=expression(theta))
+curve(CandidatePdf(x), add=TRUE, col=colorCandidateBounds, lty=lineTypeCandidate, lwd=lineWeightDistribution) #Draw a second time
+curve(TargetPdf(x), add=TRUE, col=colorTargetBounds, lwd=lineWeightDistribution) #Draw the pdf on top of the empty plot.
+
+
+### Plot that illustrates jumping (top right panel).
+plot(NA, xlim=xRangeOfGraph, ylim=yRangeOfGraph, ann=FALSE, bty="n", xaxt="n", yaxt="n", xaxs="i",yaxs="i")
+curve(CandidatePdf(x), add=T, col=colorCandidateBounds, lty=lineTypeCandidate, xpd=TRUE, lwd=lineWeightDistribution)
+curve(TargetPdf(x), col=colorTargetBounds, add=TRUE, lwd=lineWeightDistribution) #Draw the pdf on top of the empty plot.
+
+tickLocations <-c(-1.9, 0, 2)
+arrows(x0=tickLocations[2], x1=tickLocations[2], y0=0, y1=CandidatePdf(tickLocations[2]), col=colorReject, angle=90, code=3, xpd=NA, length=0, lty="16")
+arrows(x0=tickLocations[2], x1=tickLocations[2], y0=TargetPdf(tickLocations[2]), y1=CandidatePdf(tickLocations[2]), col=colorReject, angle=90, code=3, xpd=NA, length=.05, lty=lineTypeCandidate)
+arrows(x0=tickLocations[3], x1=tickLocations[3], y0=0, y1=CandidatePdf(tickLocations[3]), col=colorAccept, angle=90, code=3, xpd=NA, length=0, lty="16")
+arrows(x0=tickLocations[3], x1=tickLocations[3], y0=TargetPdf(tickLocations[3]), y1=CandidatePdf(tickLocations[3]), col=colorAccept, angle=90, code=3, xpd=NA, length=.05)
+
+rug(tickLocations, side=1, col=colorLabel)
+mtext(side=1, at=tickLocations, line=.1, c(expression(italic(D)),expression(italic(E)),expression(italic(F))), col=colorLabel)
+
+### Plot chain (bottom panel).
+plot(targetPoints[1:100], type="l", bty="n", xaxt="n", yaxt="n", ylim=c(-4,4), xpd=NA, yaxs="i",
+  col=colorAcceptFill, col.lab=colorLabel,
+  xlab="Step Number", ylab=expression(theta[italic(b)]))
+points(targetPoints[1:100], col=colorAccept, xpd=NA)
+points(loosingNewCandidatePoints[1:100], col=colorReject, pch=4, xpd=NA)
+axis(side=1, at=seq(from=0, to=100, by=10), col=colorAxisChain, col.axis=colorLabel)
+axis(side=2, at=c(-4, -2, 0, 2, 4),  col=colorAxis, col.axis=colorLabel)
+rug(tickLocations, side=4, col=colorLabel)
+mtext(side=4, at=tickLocations, las=1, c(expression(italic(D)),expression(italic(E)),expression(italic(F))), col=colorLabel)
+
+par(oldPar)
 
