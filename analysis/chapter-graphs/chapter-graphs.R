@@ -22,12 +22,15 @@ set.seed(9090)
 # library(boot)
 rtSample <- c(1, 4, 10, 50, 80)
 
-oldPar <- par(mfrow=c(1,2), mar=c(2.15,1.9,3,0), mgp=c(1, 0, 0), tcl=0)
+oldPar <- par(mfrow=c(1,2), mar=c(1.45,2.1,1.5,0), mgp=c(1, 0, 0), tcl=0)
 colorLocation <- "black"
 colorTail <- gray(.4)
 colorFill <- gray(.8)
 colorBorder <- gray(.7)
 colorCI <- gray(.5)
+colorMain <- gray(.3)
+fontMain <- 1
+
 
 ### Standard Error of the Median
 #Stage 1: Collect sample and calculate observed median
@@ -52,6 +55,9 @@ for( bootstrapIndex in seq_len(B) ) {
   bootstrapMedians[bootstrapIndex] <- star
 }
 hist(bootstrapMedians, breaks=40, col=colorFill, border=colorBorder,
+     col.main = colorMain,
+     font.main = fontMain,
+     col.lab = colorMain,
      xaxt="n", yaxt="n",
      xlab="", main="Bootstrapped Medians") #Show bootstrap stats
 axis(1, at=c(0, 40, 80), col=gray(.9), col.axis=gray(.5))
@@ -78,8 +84,11 @@ for( bootstrapIndex in seq_len(B) ) {
 }
 breaks <- seq(from=min(rtSample), to=max(rtSample)+1, length=41)
 hist(bootstrapMeans, breaks=breaks, col=colorFill, border=colorBorder,
+     col.main = colorMain,
+     font.main = fontMain,
+     col.lab = colorMain,
      xaxt="n", yaxt="n",
-     xlab="", main="Bootstrapped Means") #Show bootstrap stats
+     xlab="", ylab = "", main="Bootstrapped Means") #Show bootstrap stats
 axis(1, at=c(0, 40, 80), col=gray(.9), col.axis=gray(.5))
 axis(2, at=c(0, 100, 200, 300), col=gray(.9), col.axis=gray(.5))
 abline(v=rtMean, col=colorLocation) #Show the location of the observed stat
@@ -136,15 +145,21 @@ x <- c(1, 2, 3, 3.5, 5)
 y <- c(10, 15, 35, 25, 40)
 xRect <- rep(x, times=5)
 yRect <- rep(y, each=5)
+colorMain <- gray(.3)
+fontMain <- 1
 
 oldPar <- par(mfrow=c(1,2), mai=c(0.05,.05,.35,.05), omi=c(0,0,0,0))
 plot(x, y, col="gray70", pch=16, xpd=NA,
      xaxt="n", yaxt="n", xlab="", ylab="", cex.main=1, fg="gray70",
+     col.main = colorMain,
+     font.main = fontMain,
      main="Observed Sample and\nBivariate Sampling Frame")
 points(x, y)
 
 plot(x, y, bg="gray70", pch=21, xpd=NA,
      xaxt="n", yaxt="n", xlab="", ylab="",  cex.main=1, fg="gray70",
+     col.main = colorMain,
+     font.main = fontMain,
      main="Univariate Sampling Frame")
 points(xRect, yRect)
 par(oldPar)
@@ -166,7 +181,7 @@ pointSize <- .9
 replicationCount <- 400L #Use many more points than 400.  This low number is just for graphing.
 
 #Uncomment the next line to combine with the graph of Example 4b.
-par( mfrow=c(1,2), mar=c(2, 1.6, 1.2, 1), mgp=c(.8,0,0), tcl=0)
+par( mfrow=c(1,2), mar=c(2, 1.7, 1.4, 1), mgp=c(.8,0,0), tcl=0)
 
 #Stage 1: Specify the pdf of the posterior and draw it.
 PosteriorPdf <- function( x ) {
@@ -281,8 +296,7 @@ for( replicationIndex in seq_len(replicationCount) ) {
   if( accept ) {
     points(xValue, yValue, col=colorAccept, pch=markAccept, xpd=NA, cex=pointSize)
     posteriorPoints <- c(posteriorPoints, xValue)
-  }
-  else {
+  } else {
     points(xValue, yValue, col=colorReject, pch=markReject, xpd=F, cex=pointSize)
   }
   rm(xValue, yValue, accept) #Remove the variables
@@ -304,15 +318,16 @@ text(x=posteriorMean, y=.5, expression(bar(theta)), xpd=NA, adj = c(1.1))
 
 text(expression(italic(f)(theta)), x=0, y=PosteriorPdf(0), pos=4)
 text(expression(italic(c)%*%italic(g)(theta)), x=.5, y=scalingConstant*CandidatePdf(.5), pos=4, col=colorCandidateBounds)
+par(oldPar)
 
 # ---- independent-metropolis-hastings -----------------------------------------
 replicationCount <- 5000L
 plotGrayscale <- TRUE
 if( plotGrayscale ) { #For Figure 4.
-  colorTargetBounds <- gray(0) #"blue"
-  colorCandidateBounds <- gray(.6) #"blue"
-  colorAccept <- gray(.4)
-  colorReject <- gray(.6)
+  colorTargetBounds <- gray(0)
+  colorCandidateBounds <- gray(.6)
+  colorAccept <- gray(.7)
+  colorReject <- gray(.4)
   colorAcceptFill <- gray(.9)#hsv(h=.416,s=.2,v=.95, gamma=1)
   colorAxis <- NA #gray(.9)
   colorAxisChain <- gray(.9)
@@ -334,14 +349,21 @@ markReject <- 4 #'4' corresponds to an 'x'
 lineTypeCandidate <- "F4"
 set.seed(4) #Figure 4 was created using this seed.
 
-oldPar <- par( mar=c(2, 1.6, 0.4, 0), mgp=c(.8,0,0), tcl=0)
-layout(rbind(c(1,2, 4), c(3,3,4)), widths=c(1,1, .05))
+oldPar <-
+  par(
+    mar       = c(2.6, 3.1, 0.4, 0),
+    mgp       = c(1.4, .2, 0),
+    tcl       = 0,
+    cex.axis  = 1.6,
+    cex.lab   = 1.6
+  )
+layout(rbind(c(1,2, 4), c(3, 3, 4)), widths=c(1, 1, .05))
 
 #Prepare a blank plot (in the top left panel).  Determine the graphing limits by trial-and-error.
 xRangeOfGraph <- c(-5, 5) #This range covers the majority of the t distribution.
 yRangeOfGraph <- c(0, .36)
 plot(NA, xlim=xRangeOfGraph, ylim=yRangeOfGraph, bty="n", xaxs="i",yaxs="i", xaxt="n", yaxt="n",
-  col.axis=colorAxis, col.lab=colorLabel,
+  col.axis=colorAxis, col.lab=colorLabel, cex = 10,
   xlab=expression(theta), ylab="Density")
 axis(1, col=colorAxis, col.axis=colorLabel)
 axis(2, at=c(0, .15, .3), labels=c("0", ".15", ".3"), col=colorAxis, col.axis=colorLabel)
@@ -423,7 +445,7 @@ mtext(side=1, at=tickLocations, line=.1, c(expression(italic(D)),expression(ital
 
 ### Plot chain (bottom panel).
 plot(targetPoints[1:100], type="l", bty="n", xaxt="n", yaxt="n", ylim=c(-4,4), xpd=NA, yaxs="i",
-  col=colorAcceptFill, col.lab=colorLabel,
+  col="gray50", col.lab=colorLabel,
   xlab="Step Number", ylab=expression(theta[italic(b)]))
 points(targetPoints[1:100], col=colorAccept, xpd=NA)
 points(loosingNewCandidatePoints[1:100], col=colorReject, pch=4, xpd=NA)

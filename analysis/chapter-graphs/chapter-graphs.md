@@ -1,6 +1,6 @@
 ---
 title: Graphs of the APA Simulation Chapter
-date: "Date: 2021-03-31"
+date: "Date: 2021-04-03"
 output:
   # radix::radix_article: # radix is a newer alternative that has some advantages over `html_document`.
   html_document:
@@ -98,7 +98,7 @@ For the sake of documentation and reproducibility, the current report was render
  collate  en_US.UTF-8                 
  ctype    en_US.UTF-8                 
  tz       America/Chicago             
- date     2021-03-31                  
+ date     2021-04-03                  
 
 ─ Packages ───────────────────────────────────────────────────────────────────
  package     * version date       lib source        
@@ -166,4 +166,4 @@ For the sake of documentation and reproducibility, the current report was render
 
 
 
-Report rendered by wibeasley at 2021-03-31, 20:23 -0500 in 3 seconds.
+Report rendered by wibeasley at 2021-04-03, 19:29 -0500 in 4 seconds.
