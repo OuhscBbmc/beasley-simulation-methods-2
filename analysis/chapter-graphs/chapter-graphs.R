@@ -225,7 +225,7 @@ for( replicationIndex in 1:replicationCount ) {
 }
 
 acceptProportion <- length(posteriorPoints) / replicationCount
-mtext(paste("Accepted Proportion:", acceptProportion), line=.4, col=colorLabel)
+mtext(sprintf("Accepted Proportion: %1.3f", acceptProportion), line=.4, col=colorLabel)
 
 #Step 5: Calculate summary statistics
 posteriorMean <- mean(posteriorPoints)
@@ -303,7 +303,7 @@ for( replicationIndex in seq_len(replicationCount) ) {
 }
 
 acceptProportion <- length(posteriorPoints) / replicationCount
-mtext(paste("Accepted Proportion:", acceptProportion), line=.4, col=colorLabel)
+mtext(sprintf("Accepted Proportion: %1.3f", acceptProportion), line=.4, col=colorLabel)
 
 #Step 5: Calculate summary statistics
 posteriorMean <- mean(posteriorPoints)
@@ -347,7 +347,10 @@ lineWeightDistribution <- 1
 markAccept <- 1 #'1' corresponds to a circle for the graph
 markReject <- 4 #'4' corresponds to an 'x'
 lineTypeCandidate <- "F4"
-set.seed(4) #Figure 4 was created using this seed.
+
+# Figure 4 was created using this seed.  The article would need revisions
+#   if changed, because the text mentions certain accept/reject sequences.
+set.seed(4)
 
 oldPar <-
   par(
@@ -366,7 +369,7 @@ plot(NA, xlim=xRangeOfGraph, ylim=yRangeOfGraph, bty="n", xaxs="i",yaxs="i", xax
   col.axis=colorAxis, col.lab=colorLabel, cex = 10,
   xlab=expression(theta), ylab="Density")
 axis(1, col=colorAxis, col.axis=colorLabel)
-axis(2, at=c(0, .15, .3), labels=c("0", ".15", ".3"), col=colorAxis, col.axis=colorLabel)
+axis(2, at=c(0, .1, .2, .3), labels=c("0", ".1", ".2", ".3"), col=colorAxis, col.axis=colorLabel)
 
 #Stage 1: Define the target distribution and draw it.
 TargetPdf <- function( x ) {
@@ -450,7 +453,7 @@ plot(targetPoints[1:100], type="l", bty="n", xaxt="n", yaxt="n", ylim=c(-4,4), x
 points(targetPoints[1:100], col=colorAccept, xpd=NA)
 points(loosingNewCandidatePoints[1:100], col=colorReject, pch=4, xpd=NA)
 axis(side=1, at=seq(from=0, to=100, by=10), col=colorAxisChain, col.axis=colorLabel)
-axis(side=2, at=c(-4, -2, 0, 2, 4),  col=colorAxis, col.axis=colorLabel)
+axis(side=2, at=c(-3, 0, 3),  col=colorAxis, col.axis=colorLabel)
 rug(tickLocations, side=4, col=colorLabel)
 mtext(side=4, at=tickLocations, las=1, c(expression(italic(D)),expression(italic(E)),expression(italic(F))), col=colorLabel)
 
