@@ -328,9 +328,9 @@ if( plotGrayscale ) { #For Figure 4.
   colorCandidateBounds <- gray(.6)
   colorAccept <- gray(.7)
   colorReject <- gray(.4)
-  colorAcceptFill <- gray(.9)#hsv(h=.416,s=.2,v=.95, gamma=1)
+  colorAcceptFill <- gray(.8)#hsv(h=.416,s=.2,v=.95, gamma=1)
   colorAxis <- NA #gray(.9)
-  colorAxisChain <- gray(.9)
+  colorAxisChain <- gray(.8)
   colorLabel <- gray(.6)
 } else {
   colorTargetBounds <- "black"
@@ -338,8 +338,8 @@ if( plotGrayscale ) { #For Figure 4.
   colorAccept <- "springgreen3"
   colorReject <- "orange"
   colorAcceptFill <- hsv(h=.416,s=.2,v=.95)
-  colorAxis <- gray(.9)
-  colorAxisChain <- gray(.9)
+  colorAxis <- gray(.8)
+  colorAxisChain <- gray(.8)
   colorLabel <- gray(.6)
 }
 lineWeightDistribution <- 1
