@@ -75,25 +75,33 @@ Notes
 Example 1: Waiting Times Basic 
 ===========================================================================
 
-```{r waiting-times-basic, fig.width=8, fig.height=2, echo=echo_chunks, message=message_chunks}
+```{r waiting-times-basic}
+#| fig.width = 8, fig.height = 2,
+#| echo = echo_chunks, message = message_chunks
 ```
 
 Example 2: Sampling Frames 
 ===========================================================================
 
-```{r sampling-frame, fig.width=4.2, fig.height=1.6, echo=echo_chunks, message=message_chunks}
+```{r sampling-frame}
+#| fig.width = 4.2, fig.height = 1.6,
+#| echo = echo_chunks, message = message_chunks
 ```
 
 Example 3: Rejection Sampling
 ===========================================================================
 
-```{r rejection-sampling, fig.width=8, fig.height=3, echo=echo_chunks, message=message_chunks}
+```{r rejection-sampling}
+#| fig.width = 8, fig.height = 3,
+#| echo = echo_chunks, message = message_chunks
 ```
 
 Example 4: Independent Metropolis-Hastings
 ===========================================================================
 
-```{r independent-metropolis-hastings, fig.width=8, fig.height=3, echo=echo_chunks, message=message_chunks}
+```{r independent-metropolis-hastings}
+#| fig.width = 8, fig.height = 3,
+#| echo = echo_chunks, message = message_chunks
 ```
 
 Session Information {#session-info}
